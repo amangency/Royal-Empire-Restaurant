@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, ShoppingBag, Home, Utensils, Send, MessageSquare } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const CartModal: React.FC = () => {
-  const { cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartTotal } = useCart();
+  // cartTotal ko hata diya, khud calculate karenge
+  const { cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity } = useCart();
   
-  // State for Order Type
+  // Local State
   const [orderType, setOrderType] = useState<'delivery' | 'dine-in'>('delivery');
+  const [totalAmount, setTotalAmount] = useState(0);
   
   // Form States
   const [name, setName] = useState('');
@@ -16,11 +18,21 @@ const CartModal: React.FC = () => {
   const [tableNumber, setTableNumber] = useState('');
   const [customMessage, setCustomMessage] = useState('');
 
-  // 🔴 IMPORTANT: Replace with your WhatsApp Number
+  // 🔴 YOUR WHATSAPP NUMBER
   const PHONE_NUMBER = "918863028185"; 
 
+  // 🧮 Automatic Calculation Effect
+  useEffect(() => {
+    const total = cart.reduce((sum, item) => {
+      const price = Number(item.price) || 0;
+      const qty = Number(item.quantity) || 1;
+      return sum + (price * qty);
+    }, 0);
+    setTotalAmount(total);
+  }, [cart]);
+
   const handleOrder = () => {
-    // 1. Validation Logic
+    // 1. Validation
     if (!name) {
       alert("Please enter your Name!");
       return;
@@ -32,19 +44,17 @@ const CartModal: React.FC = () => {
         return;
       }
     } else {
-      // Dine-in validation
       if (!tableNumber) {
         alert("Please enter your Table Number!");
         return;
       }
     }
 
-    // 2. WhatsApp Message Builder
+    // 2. Message Building
     let message = `*👋 New Order Request!* \n`;
     message += `*Type:* ${orderType === 'dine-in' ? '🍽️ DINE-IN' : '🛵 DELIVERY'}\n`;
     message += `--------------------------------\n`;
     
-    // Customer Details
     message += `*Name:* ${name}\n`;
     
     if (orderType === 'delivery') {
@@ -54,7 +64,6 @@ const CartModal: React.FC = () => {
       message += `*Table No:* ${tableNumber}\n`;
     }
 
-    // Custom Message (if any)
     if (customMessage) {
       message += `*Note:* ${customMessage}\n`;
     }
@@ -62,15 +71,14 @@ const CartModal: React.FC = () => {
     message += `--------------------------------\n`;
     message += `*ORDER ITEMS:* \n`;
     
-    // Items List
     cart.forEach((item, index) => {
       message += `${index + 1}. ${item.name} x ${item.quantity} - ₹${item.price * item.quantity}\n`;
     });
 
     message += `--------------------------------\n`;
-    message += `💰 *Total Payble: ₹${cartTotal}*`;
+    message += `💰 *Total Payable: ₹${totalAmount}*`; // Used local total
 
-    // 3. Open WhatsApp
+    // 3. Send
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
@@ -79,7 +87,6 @@ const CartModal: React.FC = () => {
     <AnimatePresence>
       {isCartOpen && (
         <>
-          {/* Black Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -88,7 +95,6 @@ const CartModal: React.FC = () => {
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]"
           />
 
-          {/* Modal Content */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -110,7 +116,7 @@ const CartModal: React.FC = () => {
               </button>
             </div>
 
-            {/* Cart Items (Scrollable) */}
+            {/* Items */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-white/30 space-y-4">
@@ -155,11 +161,11 @@ const CartModal: React.FC = () => {
               )}
             </div>
 
-            {/* Footer Form & Checkout */}
+            {/* Checkout Form */}
             {cart.length > 0 && (
               <div className="p-5 bg-white/5 border-t border-white/10 space-y-4">
                 
-                {/* 1. Toggle Switch */}
+                {/* Toggle */}
                 <div className="flex bg-black p-1 rounded-md border border-white/10">
                   <button
                     onClick={() => setOrderType('delivery')}
@@ -175,9 +181,8 @@ const CartModal: React.FC = () => {
                   </button>
                 </div>
 
-                {/* 2. Input Fields */}
+                {/* Inputs */}
                 <div className="space-y-3">
-                  {/* Common: Name */}
                   <input 
                     type="text"
                     placeholder="Enter Your Name *"
@@ -186,7 +191,6 @@ const CartModal: React.FC = () => {
                     className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none"
                   />
 
-                  {/* Conditional Inputs */}
                   {orderType === 'delivery' ? (
                     <>
                       <input 
@@ -213,7 +217,6 @@ const CartModal: React.FC = () => {
                     />
                   )}
 
-                  {/* Common: Custom Message */}
                   <div className="relative">
                     <MessageSquare size={14} className="absolute top-3 left-3 text-white/30" />
                     <input 
@@ -226,11 +229,12 @@ const CartModal: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3. Total & Action */}
+                {/* Total & Button */}
                 <div className="flex justify-between items-end pt-2">
                    <div>
                       <p className="text-xs text-white/50 uppercase">Total Payable</p>
-                      <p className="text-2xl font-serif font-bold text-royal-gold">₹{cartTotal}</p>
+                      {/* FIXED: Uses Local Calculation */}
+                      <p className="text-2xl font-serif font-bold text-royal-gold">₹{totalAmount}</p>
                    </div>
                    <button
                     onClick={handleOrder}
