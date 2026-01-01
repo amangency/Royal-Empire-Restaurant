@@ -12,7 +12,8 @@ const Navbar: React.FC = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
+    // Performance: passive listener improves scrolling speed
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -20,7 +21,7 @@ const Navbar: React.FC = () => {
     e.preventDefault();
     const element = document.getElementById(id.replace('#', ''));
     if (element) {
-      const offset = 80; // height of navbar
+      const offset = 80; 
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -54,14 +55,16 @@ const Navbar: React.FC = () => {
             href="#home" 
             onClick={(e) => scrollTo(e, 'home')}
             className="flex-shrink-0 flex items-center gap-2 group relative z-10"
+            aria-label="Royal Empire Restaurant Home"
           >
-            <span className="text-2xl md:text-3xl leading-none transition-transform duration-300 group-hover:scale-110">👑</span>
+            {/* Hidden emoji from screen reader to prevent weird pronunciation */}
+            <span aria-hidden="true" className="text-2xl md:text-3xl leading-none transition-transform duration-300 group-hover:scale-110">👑</span>
             <span className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-royal-gold transition-transform duration-300 group-hover:scale-105 whitespace-nowrap">
               Royal Empire
             </span>
           </a>
 
-          {/* Desktop Navigation - Centered & Spaced */}
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex flex-1 justify-center items-center px-4">
             <div className="flex items-center gap-6 xl:gap-10 bg-royal-black/30 backdrop-blur-sm px-8 py-2 rounded-full border border-white/5">
               {navLinks.filter(l => l.name !== 'Reserve').map((link) => (
@@ -86,17 +89,18 @@ const Navbar: React.FC = () => {
               href="#booking"
               onClick={(e) => scrollTo(e, '#booking')}
               className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-royal-gold border border-royal-gold/40 px-5 py-2 hover:bg-royal-gold hover:text-black transition-all duration-300 rounded-sm whitespace-nowrap"
+              aria-label="Book a Table"
             >
-              <Calendar size={14} strokeWidth={2.5} /> 
+              <Calendar size={14} strokeWidth={2.5} aria-hidden="true" /> 
               <span>Book Table</span>
             </a>
             
             <button 
               onClick={() => setIsCartOpen(true)}
               className="relative text-royal-gold hover:text-white transition-all duration-300 p-2"
-              aria-label="Open Cart"
+              aria-label="Open Shopping Cart"
             >
-              <ShoppingBag size={22} strokeWidth={2} />
+              <ShoppingBag size={22} strokeWidth={2} aria-hidden="true" />
               {totalItems > 0 && (
                 <motion.span 
                   initial={{ scale: 0 }}
@@ -112,9 +116,10 @@ const Navbar: React.FC = () => {
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="text-royal-gold p-1"
-                aria-label="Toggle Menu"
+                aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
+                aria-expanded={mobileMenuOpen} // Batata hai ki menu khula hai ya nahi
               >
-                {mobileMenuOpen ? <X size={28} /> : <MenuIcon size={28} />}
+                {mobileMenuOpen ? <X size={28} aria-hidden="true" /> : <MenuIcon size={28} aria-hidden="true" />}
               </button>
             </div>
           </div>
@@ -129,6 +134,9 @@ const Navbar: React.FC = () => {
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed inset-0 top-0 left-0 w-full h-screen bg-royal-black flex flex-col items-center justify-center lg:hidden z-[-1]"
+            role="dialog" 
+            aria-modal="true"
+            aria-label="Mobile Navigation Menu"
           >
             <div className="space-y-8 text-center">
               {navLinks.map((link, idx) => (
