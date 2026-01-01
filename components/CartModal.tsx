@@ -18,7 +18,7 @@ const CartModal: React.FC = () => {
   const [customMessage, setCustomMessage] = useState('');
 
   // 🔴 REPLACE WITH YOUR NUMBER
-  const PHONE_NUMBER = "919876543210"; 
+  const PHONE_NUMBER = "918863028185"; 
 
   // 🧮 Auto-Calculate Total
   useEffect(() => {
