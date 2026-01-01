@@ -1,32 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, Menu as MenuIcon, X, Calendar } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { X, Minus, Plus, ShoppingBag, Bike, Utensils } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserDetails } from '../types';
 
-const CartModal: React.FC = () => {
-  const { 
-    isCartOpen, setIsCartOpen, cart, updateQuantity, 
-    removeFromCart, totalAmount, orderType, setOrderType, 
-    tableNumber, clearCart 
-  } = useCart();
+const Navbar: React.FC = () => {
+  const { totalItems, setIsCartOpen } = useCart();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [details, setDetails] = useState<UserDetails>({
-    name: '',
-    phone: '',
-    address: ''
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    // Performance improvement: passive listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setDetails(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleBrowseMenu = () => {
-    setIsCartOpen(false);
-    const element = document.getElementById('menu');
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id.replace('#', ''));
     if (element) {
-      const offset = 80;
+      const offset = 80; 
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -36,222 +31,144 @@ const CartModal: React.FC = () => {
         top: offsetPosition,
         behavior: 'smooth'
       });
+      setMobileMenuOpen(false);
     }
   };
 
-  const generateWhatsAppLink = () => {
-    if (!details.name || !details.phone) {
-      alert('Please enter Name and Phone number');
-      return;
-    }
-    if (orderType === 'delivery' && !details.address) {
-      alert('Please enter delivery address');
-      return;
-    }
-    // Validation: Require table number for Dine-In
-    if (orderType === 'dine-in' && !tableNumber && !details.tableNumber) {
-      alert('Please enter your Table Number');
-      return;
-    }
-
-    const itemString = cart.map((item, index) => 
-      `${index + 1}. ${item.name} x ${item.quantity} - ₹${item.price * item.quantity}`
-    ).join('\n');
-
-    // Determine final table number
-    const finalTable = tableNumber || details.tableNumber || 'N/A';
-
-    const typeStr = orderType === 'dine-in' 
-      ? `🍽️ Dine-In (Table ${finalTable})` 
-      : '🛵 Delivery';
-
-    const message = `*ROYAL ORDER REQUEST* 👑
-----------------------------
-*Order Details:*
-${typeStr}
-
-*Customer:*
-👤 Name: ${details.name}
-📞 Phone: ${details.phone}
-${orderType === 'delivery' ? `📍 Address: ${details.address}` : ''}
-
-*Items:*
-${itemString}
-----------------------------
-*TOTAL: ₹${totalAmount}*
-----------------------------
-_Please confirm my order._`;
-
-    // Target Number: 8863028185 (Country Code 91)
-    const phoneNumber = "918863028185";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    
-    // Open WhatsApp
-    window.open(url, '_blank');
-  };
+  const navLinks = [
+    { name: 'Home', href: '#home' },
+    { name: 'Signature', href: '#signature' },
+    { name: 'Menu', href: '#menu' },
+    { name: 'Gallery', href: '#gallery' },
+    { name: 'Reserve', href: '#booking' },
+    { name: 'Reviews', href: '#reviews' },
+    { name: 'Location', href: '#location' },
+  ];
 
   return (
-    <AnimatePresence>
-      {isCartOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsCartOpen(false)}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
-          />
-
-          {/* Drawer */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 h-full w-full md:w-[450px] bg-royal-charcoal border-l border-royal-gold/20 z-[100] shadow-2xl flex flex-col"
+    <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-royal-black/95 backdrop-blur-md py-3 shadow-2xl border-b border-royal-gold/10' : 'bg-transparent py-6'}`}>
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-full">
+          
+          {/* Logo Section (Optimized for Screen Readers) */}
+          <a 
+            href="#home" 
+            onClick={(e) => scrollTo(e, 'home')}
+            className="flex-shrink-0 flex items-center gap-2 group relative z-10"
+            aria-label="Royal Empire Restaurant Home"
           >
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black/20">
-              <div className="flex items-center gap-2 text-royal-gold">
-                <ShoppingBag />
-                <h2 className="text-xl font-serif font-bold">Your Order</h2>
-              </div>
-              <button onClick={() => setIsCartOpen(false)} className="text-gray-400 hover:text-white">
-                <X />
+            {/* Emoji hidden to prevent weird pronunciation */}
+            <span aria-hidden="true" className="text-2xl md:text-3xl leading-none transition-transform duration-300 group-hover:scale-110">👑</span>
+            <span className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-royal-gold transition-transform duration-300 group-hover:scale-105 whitespace-nowrap">
+              Royal Empire
+            </span>
+          </a>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex flex-1 justify-center items-center px-4">
+            <div className="flex items-center gap-6 xl:gap-10 bg-royal-black/30 backdrop-blur-sm px-8 py-2 rounded-full border border-white/5">
+              {navLinks.filter(l => l.name !== 'Reserve').map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => scrollTo(e, link.href)}
+                  className="group flex items-center gap-2 text-white/70 hover:text-royal-gold transition-all duration-300 font-bold text-[10px] xl:text-[11px] tracking-[0.15em] uppercase whitespace-nowrap"
+                >
+                  <span className="relative">
+                    {link.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-royal-gold transition-all duration-300 group-hover:w-full"></span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Center (Cart & Mobile Menu) */}
+          <div className="flex items-center gap-4 xl:gap-6 flex-shrink-0 relative z-10">
+            <a 
+              href="#booking"
+              onClick={(e) => scrollTo(e, '#booking')}
+              className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-royal-gold border border-royal-gold/40 px-5 py-2 hover:bg-royal-gold hover:text-black transition-all duration-300 rounded-sm whitespace-nowrap"
+              aria-label="Book a Table"
+            >
+              <Calendar size={14} strokeWidth={2.5} aria-hidden="true" /> 
+              <span>Book Table</span>
+            </a>
+            
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-royal-gold hover:text-white transition-all duration-300 p-2"
+              aria-label="Open Shopping Cart"
+            >
+              <ShoppingBag size={22} strokeWidth={2} aria-hidden="true" />
+              {totalItems > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 bg-royal-gold text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg"
+                >
+                  {totalItems}
+                </motion.span>
+              )}
+            </button>
+
+            <div className="lg:hidden">
+              <button 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-royal-gold p-1"
+                aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X size={28} aria-hidden="true" /> : <MenuIcon size={28} aria-hidden="true" />}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {cart.length === 0 ? (
-                <div className="text-center text-gray-500 mt-10">
-                  <p>Your cart is empty.</p>
-                  <button 
-                    onClick={handleBrowseMenu}
-                    className="mt-4 text-royal-gold hover:underline"
-                  >
-                    Browse Menu
-                  </button>
-                </div>
-              ) : (
-                cart.map(item => (
-                  <div key={item.id} className="flex justify-between items-center bg-black/20 p-4 rounded-md border border-white/5">
-                    <div className="flex-1">
-                      <h4 className="text-royal-silver font-medium">{item.name}</h4>
-                      <p className="text-royal-gold text-sm">₹{item.price * item.quantity}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button 
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors"
-                      >
-                        {item.quantity === 1 ? <X size={16} /> : <Minus size={16} />}
-                      </button>
-                      <span className="w-4 text-center text-sm font-bold">{item.quantity}</span>
-                      <button 
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Footer / Checkout */}
-            {cart.length > 0 && (
-              <div className="p-6 bg-black/40 border-t border-royal-gold/20 space-y-4">
-                
-                {/* Order Type Switch */}
-                {!tableNumber && (
-                  <div className="flex bg-black rounded-lg p-1 border border-white/10">
-                    <button
-                      onClick={() => setOrderType('delivery')}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${
-                        orderType === 'delivery' ? 'bg-royal-gold text-black' : 'text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      <Bike size={16} /> Delivery
-                    </button>
-                    <button
-                      onClick={() => setOrderType('dine-in')}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${
-                        orderType === 'dine-in' ? 'bg-royal-gold text-black' : 'text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      <Utensils size={16} /> Dine-In
-                    </button>
-                  </div>
-                )}
-
-                {tableNumber && (
-                  <div className="bg-royal-gold/10 border border-royal-gold/30 p-3 rounded text-center text-royal-gold text-sm font-medium">
-                    📍 Dining at Table {tableNumber}
-                  </div>
-                )}
-
-                {/* Form */}
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Your Name *"
-                    value={details.name}
-                    onChange={handleInputChange}
-                    className="w-full bg-white/5 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-royal-gold transition-colors"
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Phone Number *"
-                    value={details.phone}
-                    onChange={handleInputChange}
-                    className="w-full bg-white/5 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-royal-gold transition-colors"
-                  />
-                  {orderType === 'delivery' && (
-                     <textarea
-                     name="address"
-                     placeholder="Delivery Address *"
-                     value={details.address}
-                     onChange={handleInputChange}
-                     rows={2}
-                     className="w-full bg-white/5 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-royal-gold transition-colors resize-none"
-                   />
-                  )}
-                  {orderType === 'dine-in' && !tableNumber && (
-                    <input
-                      type="text"
-                      name="tableNumber"
-                      placeholder="Table Number *"
-                      value={details.tableNumber || ''}
-                      onChange={(e) => setDetails({...details, tableNumber: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-royal-gold transition-colors"
-                    />
-                  )}
-                </div>
-
-                {/* Total & Action */}
-                <div className="flex justify-between items-center text-lg font-bold text-white pt-2">
-                  <span>Total</span>
-                  <span className="text-royal-gold">₹{totalAmount}</span>
-                </div>
-
-                <button
-                  onClick={generateWhatsAppLink}
-                  className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded shadow-lg shadow-green-900/20 transition-all transform hover:translate-y-[-1px] flex items-center justify-center gap-2"
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 top-0 left-0 w-full h-screen bg-royal-black flex flex-col items-center justify-center lg:hidden z-[-1]"
+            role="dialog" 
+            aria-modal="true"
+            aria-label="Mobile Navigation Menu"
+          >
+            <div className="space-y-8 text-center">
+              {navLinks.map((link, idx) => (
+                <motion.a
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => scrollTo(e, link.href)}
+                  className="block text-2xl font-serif font-bold text-royal-silver hover:text-royal-gold transition-colors"
                 >
-                   Complete Order on WhatsApp
-                </button>
-              </div>
-            )}
+                  {link.name}
+                </motion.a>
+              ))}
+              <motion.a 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                href="#booking"
+                onClick={(e) => scrollTo(e, '#booking')}
+                className="inline-block mt-8 bg-royal-gold text-black px-12 py-4 rounded-sm font-bold uppercase tracking-widest text-sm"
+              >
+                Reserve Now
+              </motion.a>
+            </div>
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+    </nav>
   );
 };
 
-export default CartModal;
+export default Navbar;
