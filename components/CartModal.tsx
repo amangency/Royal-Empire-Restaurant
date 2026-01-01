@@ -1,84 +1,85 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, ShoppingBag, MapPin, Loader2, Home, Utensils } from 'lucide-react';
+import { X, Trash2, ShoppingBag, Home, Utensils, Send, MessageSquare } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const CartModal: React.FC = () => {
   const { cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartTotal } = useCart();
   
-  // State for Order Type (Delivery or Dine-in)
+  // State for Order Type
   const [orderType, setOrderType] = useState<'delivery' | 'dine-in'>('delivery');
+  
+  // Form States
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [tableNumber, setTableNumber] = useState('');
-  const [isLocating, setIsLocating] = useState(false);
+  const [customMessage, setCustomMessage] = useState('');
 
-  // 🔴 Change this to your WhatsApp Number
+  // 🔴 IMPORTANT: Replace with your WhatsApp Number
   const PHONE_NUMBER = "918863028185"; 
 
   const handleOrder = () => {
-    // Validation
-    if (orderType === 'delivery' && !address && !isLocating) {
-      alert("Please enter your address or detect location!");
+    // 1. Validation Logic
+    if (!name) {
+      alert("Please enter your Name!");
       return;
     }
-    if (orderType === 'dine-in' && !tableNumber) {
-      alert("Please enter your table number!");
-      return;
-    }
-
-    const sendWhatsApp = (gpsLink = '') => {
-      let message = `*👋 New Order Request!* \n`;
-      message += `*Type:* ${orderType === 'dine-in' ? '🍽️ DINE-IN' : '🛵 DELIVERY'}\n`;
-      
-      if (orderType === 'dine-in') {
-        message += `*Table No:* ${tableNumber}\n`;
-      } else {
-        message += `*Address:* ${address}\n`;
-        if (gpsLink) message += `*GPS Location:* ${gpsLink}\n`;
+    
+    if (orderType === 'delivery') {
+      if (!phone || !address) {
+        alert("Please enter Phone Number and Address for delivery!");
+        return;
       }
-
-      message += `--------------------------------\n`;
-      
-      // Items
-      cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} x ${item.quantity} - ₹${item.price * item.quantity}\n`;
-      });
-
-      message += `--------------------------------\n`;
-      message += `💰 *Total Payble: ₹${cartTotal}*`;
-
-      const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-      setIsLocating(false);
-    };
-
-    // Logic: If Delivery + GPS requested
-    if (orderType === 'delivery' && isLocating && "geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const link = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
-          sendWhatsApp(link);
-        },
-        (error) => {
-          console.log("GPS Error", error);
-          sendWhatsApp(); // Send without GPS if error
-        }
-      );
     } else {
-      sendWhatsApp(); // Direct send for Dine-in or Manual Address
+      // Dine-in validation
+      if (!tableNumber) {
+        alert("Please enter your Table Number!");
+        return;
+      }
     }
-  };
 
-  const handleGPSClick = () => {
-    setIsLocating(true);
-    handleOrder();
+    // 2. WhatsApp Message Builder
+    let message = `*👋 New Order Request!* \n`;
+    message += `*Type:* ${orderType === 'dine-in' ? '🍽️ DINE-IN' : '🛵 DELIVERY'}\n`;
+    message += `--------------------------------\n`;
+    
+    // Customer Details
+    message += `*Name:* ${name}\n`;
+    
+    if (orderType === 'delivery') {
+      message += `*Phone:* ${phone}\n`;
+      message += `*Address:* ${address}\n`;
+    } else {
+      message += `*Table No:* ${tableNumber}\n`;
+    }
+
+    // Custom Message (if any)
+    if (customMessage) {
+      message += `*Note:* ${customMessage}\n`;
+    }
+
+    message += `--------------------------------\n`;
+    message += `*ORDER ITEMS:* \n`;
+    
+    // Items List
+    cart.forEach((item, index) => {
+      message += `${index + 1}. ${item.name} x ${item.quantity} - ₹${item.price * item.quantity}\n`;
+    });
+
+    message += `--------------------------------\n`;
+    message += `💰 *Total Payble: ₹${cartTotal}*`;
+
+    // 3. Open WhatsApp
+    const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
   };
 
   return (
     <AnimatePresence>
       {isCartOpen && (
         <>
-          {/* Black Background Overlay */}
+          {/* Black Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -87,7 +88,7 @@ const CartModal: React.FC = () => {
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]"
           />
 
-          {/* Modal Panel */}
+          {/* Modal Content */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -109,7 +110,7 @@ const CartModal: React.FC = () => {
               </button>
             </div>
 
-            {/* Scrollable Items Area */}
+            {/* Cart Items (Scrollable) */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-white/30 space-y-4">
@@ -154,7 +155,7 @@ const CartModal: React.FC = () => {
               )}
             </div>
 
-            {/* Footer Logic (Toggle + Inputs) */}
+            {/* Footer Form & Checkout */}
             {cart.length > 0 && (
               <div className="p-5 bg-white/5 border-t border-white/10 space-y-4">
                 
@@ -174,33 +175,55 @@ const CartModal: React.FC = () => {
                   </button>
                 </div>
 
-                {/* 2. Dynamic Inputs */}
+                {/* 2. Input Fields */}
                 <div className="space-y-3">
+                  {/* Common: Name */}
+                  <input 
+                    type="text"
+                    placeholder="Enter Your Name *"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none"
+                  />
+
+                  {/* Conditional Inputs */}
                   {orderType === 'delivery' ? (
-                    <div className="space-y-2">
-                       <textarea 
-                        placeholder="Enter full address..."
+                    <>
+                      <input 
+                        type="tel"
+                        placeholder="Phone Number *"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none"
+                      />
+                      <textarea 
+                        placeholder="Full Delivery Address *"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none resize-none h-20"
+                        className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none resize-none h-16"
                       />
-                      <button 
-                        onClick={handleGPSClick}
-                        className="w-full py-2 border border-green-500/30 text-green-400 text-xs font-bold uppercase tracking-widest hover:bg-green-500/10 rounded-sm flex items-center justify-center gap-2"
-                      >
-                        {isLocating ? <Loader2 size={14} className="animate-spin"/> : <MapPin size={14} />}
-                        {isLocating ? "Detecting..." : "Auto-Detect My Location"}
-                      </button>
-                    </div>
+                    </>
                   ) : (
                     <input 
                       type="text"
-                      placeholder="Enter Table Number (e.g., 5)"
+                      placeholder="Table Number (e.g. 5) *"
                       value={tableNumber}
                       onChange={(e) => setTableNumber(e.target.value)}
                       className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none"
                     />
                   )}
+
+                  {/* Common: Custom Message */}
+                  <div className="relative">
+                    <MessageSquare size={14} className="absolute top-3 left-3 text-white/30" />
+                    <input 
+                      type="text"
+                      placeholder="Any cooking request? (Optional)"
+                      value={customMessage}
+                      onChange={(e) => setCustomMessage(e.target.value)}
+                      className="w-full bg-black border border-white/20 rounded-sm p-3 pl-9 text-sm text-white focus:border-royal-gold outline-none"
+                    />
+                  </div>
                 </div>
 
                 {/* 3. Total & Action */}
@@ -210,10 +233,11 @@ const CartModal: React.FC = () => {
                       <p className="text-2xl font-serif font-bold text-royal-gold">₹{cartTotal}</p>
                    </div>
                    <button
-                    onClick={() => handleOrder()}
-                    className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-sm font-bold uppercase tracking-widest text-sm shadow-lg"
+                    onClick={handleOrder}
+                    className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-sm font-bold uppercase tracking-widest text-sm shadow-lg flex items-center gap-2"
                    >
-                     Order Now
+                     <span>Send Order</span>
+                     <Send size={16} />
                    </button>
                 </div>
               </div>
