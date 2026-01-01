@@ -24,7 +24,6 @@ const reviews = [
     text: "Great ambiance and staff. The Biryani is a must-try.",
     date: "3 weeks ago"
   },
-  // Duplicating for seamless scrolling effect
   {
     id: 4,
     name: "Vikram Malhotra",
@@ -35,7 +34,7 @@ const reviews = [
    {
     id: 5,
     name: "Sneha Gupta",
-    rating: 4,
+    rating: 5,
     text: "Loved the vibe! Perfect place for anniversary dinner. Cocktails were amazing.",
     date: "1 month ago"
   }
@@ -45,90 +44,93 @@ const reviews = [
 const duplicatedReviews = [...reviews, ...reviews];
 
 const Reviews: React.FC = () => {
-  // ✅ YOUR SPECIFIC PLACE ID
   const GOOGLE_PLACE_ID = "ChIJi51R6RYR7TkRviG57pCe3fo"; 
   const reviewLink = `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
 
   return (
-    <section id="reviews" className="py-24 bg-royal-charcoal relative overflow-hidden">
-      {/* Background Gradient Elements */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-royal-gold/5 via-transparent to-transparent opacity-50"></div>
+    <section id="reviews" className="py-24 bg-black relative overflow-hidden">
       
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Header */}
-        <div className="text-center mb-16">
+      {/* Container for Header Only */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-16">
+        <div className="text-center">
           <span className="text-royal-gold text-xs font-bold tracking-[0.3em] uppercase">Testimonials</span>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mt-4">
             The Royal Experience
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-transparent via-royal-gold to-transparent mx-auto mt-8"></div>
+          <div className="w-24 h-1 bg-royal-gold mx-auto mt-6"></div>
         </div>
+      </div>
 
-        {/* 🔄 Moving Reviews Slider (Marquee Effect) */}
-        <div className="relative w-full overflow-hidden fade-mask-x py-8">
-          <motion.div
-            className="flex gap-8 w-max"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ ease: "linear", duration: 35, repeat: Infinity }}
-          >
-            {duplicatedReviews.map((review, idx) => (
-              <div
-                key={`${review.id}-${idx}`}
-                className="w-[350px] md:w-[450px] flex-shrink-0 bg-white/5 backdrop-blur-md p-8 border border-white/10 rounded-sm relative group hover:border-royal-gold/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-royal-gold/10"
-              >
-                <Quote className="absolute top-6 right-6 text-royal-gold/20 group-hover:text-royal-gold/40 transition-colors" size={48} />
-                
-                <div className="flex gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      size={18} 
-                      className={`${i < review.rating ? 'text-royal-gold fill-royal-gold drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]' : 'text-gray-600'}`} 
-                    />
-                  ))}
+      {/* 🔄 Moving Reviews Slider (FULL WIDTH - No Container Restriction) */}
+      <div className="relative w-full overflow-hidden">
+        {/* Left Fade Gradient */}
+        <div className="absolute top-0 left-0 h-full w-24 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none"></div>
+        {/* Right Fade Gradient */}
+        <div className="absolute top-0 right-0 h-full w-24 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none"></div>
+
+        <motion.div
+          className="flex gap-6 w-max pl-4"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ ease: "linear", duration: 40, repeat: Infinity }}
+        >
+          {duplicatedReviews.map((review, idx) => (
+            <div
+              key={`${review.id}-${idx}`}
+              className="w-[350px] md:w-[450px] flex-shrink-0 bg-black p-8 border border-white/10 rounded-sm relative group hover:border-royal-gold transition-all duration-300"
+            >
+              <Quote className="absolute top-6 right-6 text-royal-gold/10 group-hover:text-royal-gold/30 transition-colors" size={40} />
+              
+              <div className="flex gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    size={16} 
+                    className={`${i < review.rating ? 'text-royal-gold fill-royal-gold' : 'text-gray-800'}`} 
+                  />
+                ))}
+              </div>
+              
+              {/* Font Restored to standard sans for readability, Serif for names */}
+              <p className="text-gray-300 mb-8 italic leading-relaxed text-lg font-light">"{review.text}"</p>
+              
+              <div className="flex justify-between items-end border-t border-white/10 pt-6">
+                <div>
+                  <h4 className="text-white font-bold font-serif text-xl tracking-wide">{review.name}</h4>
+                  <span className="text-xs text-royal-gold/60 uppercase tracking-widest">{review.date}</span>
                 </div>
-                
-                <p className="text-royal-silver/90 mb-8 italic leading-relaxed text-lg">"{review.text}"</p>
-                
-                <div className="flex justify-between items-end border-t border-white/5 pt-6">
-                  <div>
-                    <h4 className="text-white font-bold font-serif text-xl tracking-wide">{review.name}</h4>
-                    <span className="text-sm text-royal-gold/60 uppercase tracking-widest">{review.date}</span>
-                  </div>
-                  <div className="w-10 h-10 rounded-sm bg-gradient-to-br from-royal-gold to-amber-600 flex items-center justify-center text-black font-black font-serif text-lg shadow-lg transform rotate-3 group-hover:rotate-0 transition-all">
-                    {review.name.charAt(0)}
-                  </div>
+                <div className="w-10 h-10 rounded-full bg-royal-gold/10 flex items-center justify-center text-royal-gold font-serif font-bold text-lg border border-royal-gold/20">
+                  {review.name.charAt(0)}
                 </div>
               </div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* 🚀 CTA Link (Luxury Gold Button) */}
-        <div className="text-center mt-12">
-          <motion.a
-            href={reviewLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-4 bg-royal-gold text-black px-10 py-5 rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-white transition-all duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] hover:shadow-[0_0_50px_rgba(255,255,255,0.3)] group cursor-pointer border border-royal-gold"
-          >
-            <span>Rate Us on Google</span>
-            <div className="flex gap-1">
-              <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-              <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-              <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-              <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-              <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
             </div>
-            <ArrowRight className="group-hover:translate-x-2 transition-transform duration-300" />
-          </motion.a>
-          <p className="mt-6 text-royal-gold/60 text-sm tracking-wider uppercase">Tap to unlock the review page directly</p>
-        </div>
-
+          ))}
+        </motion.div>
       </div>
+
+      {/* 🚀 CTA Button (FIXED: No White Hover, Gold & Black Only) */}
+      <div className="text-center mt-16 relative z-10">
+        <motion.a
+          href={reviewLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="inline-flex items-center gap-4 bg-royal-gold text-black px-10 py-5 rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-royal-gold border border-royal-gold transition-all duration-300 group cursor-pointer"
+        >
+          <span>Rate Us on Google</span>
+          <div className="flex gap-1">
+            {/* Stars change color on hover logic */}
+            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
+            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
+            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
+            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
+            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
+          </div>
+          <ArrowRight className="group-hover:translate-x-2 transition-transform duration-300" />
+        </motion.a>
+        <p className="mt-6 text-white/30 text-xs tracking-wider uppercase">Tap to open Google Reviews directly</p>
+      </div>
+
     </section>
   );
 };
