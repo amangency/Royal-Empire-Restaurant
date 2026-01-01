@@ -15,12 +15,17 @@ const Reviews = lazy(() => import('./components/Reviews'));
 const Booking = lazy(() => import('./components/Booking'));
 const Location = lazy(() => import('./components/Location'));
 
-// Simple loading placeholder
+// Optimized Loader: Accessible & prevents layout shift
 const SectionLoader = () => (
-  <div className="py-24 flex justify-center items-center bg-royal-black">
+  <div 
+    role="status" 
+    aria-label="Loading content"
+    className="min-h-[400px] flex justify-center items-center bg-royal-black"
+  >
     <div className="animate-spin text-royal-gold/30">
       <Compass size={32} />
     </div>
+    <span className="sr-only">Loading section...</span>
   </div>
 );
 
@@ -31,11 +36,13 @@ function App() {
     <CartProvider>
       <div className="min-h-screen bg-royal-black text-white font-sans selection:bg-royal-gold selection:text-black">
         <Navbar />
-        <main>
-          {/* Hero loads immediately */}
+        
+        {/* 'role="main"' helps Accessibility & SEO */}
+        <main role="main">
+          {/* Hero loads immediately (LCP Optimized) */}
           <Hero />
           
-          {/* Rest of the site loads only when needed */}
+          {/* Rest of the site loads progressively */}
           <Suspense fallback={<SectionLoader />}>
             <Bestsellers />
             <Features />
@@ -49,6 +56,7 @@ function App() {
             />
           </Suspense>
         </main>
+
         <CartModal />
         
         {/* About Us & Terms Overlays */}
