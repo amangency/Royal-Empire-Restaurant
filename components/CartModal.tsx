@@ -1,174 +1,228 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu as MenuIcon, X, Calendar } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X, Trash2, ShoppingBag, MapPin, Loader2, Home, Utensils } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
-const Navbar: React.FC = () => {
-  const { totalItems, setIsCartOpen } = useCart();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const CartModal: React.FC = () => {
+  const { cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartTotal } = useCart();
+  
+  // State for Order Type (Delivery or Dine-in)
+  const [orderType, setOrderType] = useState<'delivery' | 'dine-in'>('delivery');
+  const [address, setAddress] = useState('');
+  const [tableNumber, setTableNumber] = useState('');
+  const [isLocating, setIsLocating] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    // Performance improvement: passive listener
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // 🔴 Change this to your WhatsApp Number
+  const PHONE_NUMBER = "918863028185"; 
 
-  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const element = document.getElementById(id.replace('#', ''));
-    if (element) {
-      const offset = 80; 
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
+  const handleOrder = () => {
+    // Validation
+    if (orderType === 'delivery' && !address && !isLocating) {
+      alert("Please enter your address or detect location!");
+      return;
+    }
+    if (orderType === 'dine-in' && !tableNumber) {
+      alert("Please enter your table number!");
+      return;
+    }
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
+    const sendWhatsApp = (gpsLink = '') => {
+      let message = `*👋 New Order Request!* \n`;
+      message += `*Type:* ${orderType === 'dine-in' ? '🍽️ DINE-IN' : '🛵 DELIVERY'}\n`;
+      
+      if (orderType === 'dine-in') {
+        message += `*Table No:* ${tableNumber}\n`;
+      } else {
+        message += `*Address:* ${address}\n`;
+        if (gpsLink) message += `*GPS Location:* ${gpsLink}\n`;
+      }
+
+      message += `--------------------------------\n`;
+      
+      // Items
+      cart.forEach((item, index) => {
+        message += `${index + 1}. ${item.name} x ${item.quantity} - ₹${item.price * item.quantity}\n`;
       });
-      setMobileMenuOpen(false);
+
+      message += `--------------------------------\n`;
+      message += `💰 *Total Payble: ₹${cartTotal}*`;
+
+      const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+      setIsLocating(false);
+    };
+
+    // Logic: If Delivery + GPS requested
+    if (orderType === 'delivery' && isLocating && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const link = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+          sendWhatsApp(link);
+        },
+        (error) => {
+          console.log("GPS Error", error);
+          sendWhatsApp(); // Send without GPS if error
+        }
+      );
+    } else {
+      sendWhatsApp(); // Direct send for Dine-in or Manual Address
     }
   };
 
-  const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'Signature', href: '#signature' },
-    { name: 'Menu', href: '#menu' },
-    { name: 'Gallery', href: '#gallery' },
-    { name: 'Reserve', href: '#booking' },
-    { name: 'Reviews', href: '#reviews' },
-    { name: 'Location', href: '#location' },
-  ];
+  const handleGPSClick = () => {
+    setIsLocating(true);
+    handleOrder();
+  };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-royal-black/95 backdrop-blur-md py-3 shadow-2xl border-b border-royal-gold/10' : 'bg-transparent py-6'}`}>
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-full">
-          
-          {/* Logo Section (Optimized for Screen Readers) */}
-          <a 
-            href="#home" 
-            onClick={(e) => scrollTo(e, 'home')}
-            className="flex-shrink-0 flex items-center gap-2 group relative z-10"
-            aria-label="Royal Empire Restaurant Home"
+    <AnimatePresence>
+      {isCartOpen && (
+        <>
+          {/* Black Background Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsCartOpen(false)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]"
+          />
+
+          {/* Modal Panel */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-royal-black border-l border-royal-gold/20 shadow-2xl z-[70] flex flex-col"
           >
-            {/* Emoji hidden to prevent weird pronunciation */}
-            <span aria-hidden="true" className="text-2xl md:text-3xl leading-none transition-transform duration-300 group-hover:scale-110">👑</span>
-            <span className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-royal-gold transition-transform duration-300 group-hover:scale-105 whitespace-nowrap">
-              Royal Empire
-            </span>
-          </a>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex flex-1 justify-center items-center px-4">
-            <div className="flex items-center gap-6 xl:gap-10 bg-royal-black/30 backdrop-blur-sm px-8 py-2 rounded-full border border-white/5">
-              {navLinks.filter(l => l.name !== 'Reserve').map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => scrollTo(e, link.href)}
-                  className="group flex items-center gap-2 text-white/70 hover:text-royal-gold transition-all duration-300 font-bold text-[10px] xl:text-[11px] tracking-[0.15em] uppercase whitespace-nowrap"
-                >
-                  <span className="relative">
-                    {link.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-royal-gold transition-all duration-300 group-hover:w-full"></span>
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Action Center (Cart & Mobile Menu) */}
-          <div className="flex items-center gap-4 xl:gap-6 flex-shrink-0 relative z-10">
-            <a 
-              href="#booking"
-              onClick={(e) => scrollTo(e, '#booking')}
-              className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-royal-gold border border-royal-gold/40 px-5 py-2 hover:bg-royal-gold hover:text-black transition-all duration-300 rounded-sm whitespace-nowrap"
-              aria-label="Book a Table"
-            >
-              <Calendar size={14} strokeWidth={2.5} aria-hidden="true" /> 
-              <span>Book Table</span>
-            </a>
-            
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              className="relative text-royal-gold hover:text-white transition-all duration-300 p-2"
-              aria-label="Open Shopping Cart"
-            >
-              <ShoppingBag size={22} strokeWidth={2} aria-hidden="true" />
-              {totalItems > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 bg-royal-gold text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg"
-                >
-                  {totalItems}
-                </motion.span>
-              )}
-            </button>
-
-            <div className="lg:hidden">
+            {/* Header */}
+            <div className="p-5 border-b border-white/10 flex justify-between items-center bg-white/5">
+              <h2 className="text-xl font-serif font-bold text-royal-gold flex items-center gap-2">
+                <ShoppingBag size={20} /> Your Cart
+              </h2>
               <button 
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-royal-gold p-1"
-                aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
-                aria-expanded={mobileMenuOpen}
+                onClick={() => setIsCartOpen(false)}
+                className="text-white/50 hover:text-white transition-colors"
+                aria-label="Close Cart"
               >
-                {mobileMenuOpen ? <X size={28} aria-hidden="true" /> : <MenuIcon size={28} aria-hidden="true" />}
+                <X size={24} />
               </button>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 top-0 left-0 w-full h-screen bg-royal-black flex flex-col items-center justify-center lg:hidden z-[-1]"
-            role="dialog" 
-            aria-modal="true"
-            aria-label="Mobile Navigation Menu"
-          >
-            <div className="space-y-8 text-center">
-              {navLinks.map((link, idx) => (
-                <motion.a
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => scrollTo(e, link.href)}
-                  className="block text-2xl font-serif font-bold text-royal-silver hover:text-royal-gold transition-colors"
-                >
-                  {link.name}
-                </motion.a>
-              ))}
-              <motion.a 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                href="#booking"
-                onClick={(e) => scrollTo(e, '#booking')}
-                className="inline-block mt-8 bg-royal-gold text-black px-12 py-4 rounded-sm font-bold uppercase tracking-widest text-sm"
-              >
-                Reserve Now
-              </motion.a>
+            {/* Scrollable Items Area */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {cart.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-white/30 space-y-4">
+                  <ShoppingBag size={48} strokeWidth={1} />
+                  <p>Your cart is empty.</p>
+                </div>
+              ) : (
+                cart.map((item) => (
+                  <motion.div 
+                    layout
+                    key={item.id} 
+                    className="flex gap-4 bg-white/5 p-3 rounded-sm border border-white/5"
+                  >
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-sm" />
+                    <div className="flex-1">
+                      <h3 className="font-bold text-royal-silver text-sm">{item.name}</h3>
+                      <p className="text-royal-gold text-xs">₹{item.price}</p>
+                      
+                      <div className="flex items-center gap-3 mt-2">
+                        <div className="flex items-center bg-black rounded-sm border border-white/10">
+                          <button 
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="px-2 text-white/50 hover:text-white"
+                            disabled={item.quantity <= 1}
+                          >-</button>
+                          <span className="px-2 text-xs text-white font-mono">{item.quantity}</span>
+                          <button 
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="px-2 text-white/50 hover:text-white"
+                          >+</button>
+                        </div>
+                        <button 
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-red-400/50 hover:text-red-400 ml-auto"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
             </div>
+
+            {/* Footer Logic (Toggle + Inputs) */}
+            {cart.length > 0 && (
+              <div className="p-5 bg-white/5 border-t border-white/10 space-y-4">
+                
+                {/* 1. Toggle Switch */}
+                <div className="flex bg-black p-1 rounded-md border border-white/10">
+                  <button
+                    onClick={() => setOrderType('delivery')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-sm transition-all ${orderType === 'delivery' ? 'bg-royal-gold text-black shadow-lg' : 'text-white/50 hover:text-white'}`}
+                  >
+                    <Home size={14} /> Delivery
+                  </button>
+                  <button
+                    onClick={() => setOrderType('dine-in')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-sm transition-all ${orderType === 'dine-in' ? 'bg-royal-gold text-black shadow-lg' : 'text-white/50 hover:text-white'}`}
+                  >
+                    <Utensils size={14} /> Dine-in
+                  </button>
+                </div>
+
+                {/* 2. Dynamic Inputs */}
+                <div className="space-y-3">
+                  {orderType === 'delivery' ? (
+                    <div className="space-y-2">
+                       <textarea 
+                        placeholder="Enter full address..."
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none resize-none h-20"
+                      />
+                      <button 
+                        onClick={handleGPSClick}
+                        className="w-full py-2 border border-green-500/30 text-green-400 text-xs font-bold uppercase tracking-widest hover:bg-green-500/10 rounded-sm flex items-center justify-center gap-2"
+                      >
+                        {isLocating ? <Loader2 size={14} className="animate-spin"/> : <MapPin size={14} />}
+                        {isLocating ? "Detecting..." : "Auto-Detect My Location"}
+                      </button>
+                    </div>
+                  ) : (
+                    <input 
+                      type="text"
+                      placeholder="Enter Table Number (e.g., 5)"
+                      value={tableNumber}
+                      onChange={(e) => setTableNumber(e.target.value)}
+                      className="w-full bg-black border border-white/20 rounded-sm p-3 text-sm text-white focus:border-royal-gold outline-none"
+                    />
+                  )}
+                </div>
+
+                {/* 3. Total & Action */}
+                <div className="flex justify-between items-end pt-2">
+                   <div>
+                      <p className="text-xs text-white/50 uppercase">Total Payable</p>
+                      <p className="text-2xl font-serif font-bold text-royal-gold">₹{cartTotal}</p>
+                   </div>
+                   <button
+                    onClick={() => handleOrder()}
+                    className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-sm font-bold uppercase tracking-widest text-sm shadow-lg"
+                   >
+                     Order Now
+                   </button>
+                </div>
+              </div>
+            )}
           </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
-export default Navbar;
+export default CartModal;
