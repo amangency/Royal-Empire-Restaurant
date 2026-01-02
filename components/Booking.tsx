@@ -38,21 +38,23 @@ const Booking: React.FC = () => {
   };
 
   return (
-    // ✅ FIXED: Increased padding (py-24) and added extra bottom padding (pb-32) to prevent cutting
-    <section id="booking" className="pt-24 pb-40 bg-black relative overflow-hidden">
+    // ✅ FIXED: 'min-h-screen' ensures it covers full height, 'h-auto' lets it grow, 'pb-48' gives massive bottom space on mobile
+    <section id="booking" className="w-full min-h-screen h-auto bg-black relative overflow-hidden py-20 pb-48 md:py-32">
       
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[url('/images/pattern-dark.png')] opacity-10 mix-blend-overlay"></div>
+      <div className="absolute inset-0 bg-[url('/images/pattern-dark.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+      {/* Gold Glow at bottom to visually indicate end */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-royal-gold/5 to-transparent pointer-events-none"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
           
           {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="space-y-6 md:space-y-8 text-center lg:text-left lg:sticky lg:top-24"
+            viewport={{ once: true }}
+            className="text-center lg:text-left pt-4 lg:sticky lg:top-32"
           >
             <div>
               <span className="text-royal-gold text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center lg:justify-start gap-3">
@@ -60,52 +62,52 @@ const Booking: React.FC = () => {
                 Reservations
               </span>
               
-              <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mt-4 leading-tight">
+              <h2 className="text-4xl md:text-6xl font-serif font-bold text-white mt-4 leading-tight">
                 Book Your <span className="text-royal-gold">Royal Table</span>
               </h2>
             </div>
             
-            <p className="text-gray-400 text-sm md:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
+            <p className="text-gray-400 text-sm md:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-light mt-6">
               Reserve your spot for an unforgettable fine dining experience. 
               <br className="hidden md:block" />
               Direct WhatsApp booking for instant confirmation.
             </p>
           </motion.div>
 
-          {/* 💎 The Form (Ensured Full Visibility) */}
+          {/* 💎 The Form (With Extra Safe Padding) */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }} // Triggers earlier
-            className="bg-white/5 backdrop-blur-md p-6 md:p-10 rounded-sm border border-white/10 relative group w-full"
+            viewport={{ once: true }}
+            className="bg-white/5 backdrop-blur-md p-6 md:p-10 rounded-sm border border-white/10 relative w-full shadow-2xl"
           >
-            <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+            <form onSubmit={handleSubmit} className="space-y-5 relative z-20">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 
                 <InputGroup icon={<Users size={16} />} label="Full Name">
-                    <input type="text" name="name" placeholder="Rahul Sharma" value={formData.name} onChange={handleChange} 
-                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
+                    <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} 
+                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-4 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
                 </InputGroup>
 
                 <InputGroup icon={<Send size={16} />} label="Phone Number">
-                    <input type="tel" name="phone" placeholder="+91 98765..." value={formData.phone} onChange={handleChange}
-                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
+                    <input type="tel" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange}
+                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-4 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
                 </InputGroup>
 
                 <InputGroup icon={<Calendar size={16} />} label="Date">
                     <input type="date" name="date" value={formData.date} onChange={handleChange}
-                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all uppercase" required />
+                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-4 text-white text-sm focus:border-royal-gold outline-none transition-all uppercase" required />
                 </InputGroup>
 
                  <InputGroup icon={<Clock size={16} />} label="Time">
                     <input type="time" name="time" value={formData.time} onChange={handleChange}
-                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
+                      className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-4 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
                 </InputGroup>
                 
                 <div className="md:col-span-2 grid grid-cols-2 gap-4">
                   <InputGroup icon={<Users size={16} />} label="Guests">
                       <select name="guests" value={formData.guests} onChange={handleChange}
-                        className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all appearance-none">
+                        className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-4 text-white text-sm focus:border-royal-gold outline-none transition-all appearance-none">
                           {[1,2,3,4,5,6,7,8,"8+"].map(num => (
                               <option key={num} value={`${num} Guests`} className="bg-black text-white">{num} Guests</option>
                           ))}
@@ -113,8 +115,8 @@ const Booking: React.FC = () => {
                   </InputGroup>
 
                   <InputGroup icon={<Utensils size={16} />} label="Occasion">
-                    <input type="text" name="occasion" placeholder="Birthday..." value={formData.occasion} onChange={handleChange}
-                        className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all" />
+                    <input type="text" name="occasion" placeholder="Occasion" value={formData.occasion} onChange={handleChange}
+                        className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-4 text-white text-sm focus:border-royal-gold outline-none transition-all" />
                   </InputGroup>
                 </div>
 
@@ -125,10 +127,10 @@ const Booking: React.FC = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full bg-royal-gold text-black py-4 px-4 rounded-sm font-bold uppercase tracking-[0.15em] text-xs md:text-sm flex items-center justify-center gap-2 hover:bg-white transition-all duration-300 shadow-lg group mt-2"
+                className="w-full bg-royal-gold text-black py-4 px-4 rounded-sm font-bold uppercase tracking-[0.15em] text-xs md:text-sm flex items-center justify-center gap-2 hover:bg-white transition-all duration-300 shadow-lg mt-4"
               >
                 <span className="truncate">Send Request to Concierge</span>
-                <Send size={16} className="group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                <Send size={16} className="flex-shrink-0" />
               </motion.button>
               
             </form>
