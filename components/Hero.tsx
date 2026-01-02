@@ -22,10 +22,11 @@ const Hero: React.FC = () => {
 
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay - Optimized URL */}
+      {/* Background Image - ✅ FIXED: Now using Local Path */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://res.cloudinary.com/dvcgzneiy/image/upload/w_1920,q_auto,f_auto/v1767265244/Whisk_9b05d71a7cf71f1b59144526d582b599dr_mvk2me.webp"
+          // 👇 YAHAN CHANGE KIYA HAI
+          src="/images/hero-bg.webp"
           alt="Royal Dining Table"
           className="w-full h-full object-cover"
           // @ts-ignore
