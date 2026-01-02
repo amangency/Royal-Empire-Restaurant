@@ -16,7 +16,7 @@ export const menuItems: MenuItem[] = [
     description: "Classic stir-fried noodles with fresh vegetables and aromatic spices.",
     isBestSeller: true,
     isVeg: true,
-    image: "https://res.cloudinary.com/dvcgzneiy/image/upload/v1767263348/Whisk_951aaab98c03f97861f48a22fba0c32edr_wcgtzt.webp"
+    image: "/images/chowmein.webp"
   },
   {
     id: 2,
@@ -36,7 +36,7 @@ export const menuItems: MenuItem[] = [
     description: "Black lentils simmered overnight with butter and cream.",
     isBestSeller: true,
     isVeg: true,
-    image: "https://res.cloudinary.com/dvcgzneiy/image/upload/v1767263348/Whisk_562f5ab6f492472a193491d519eb0be0dr_vtje5l.webp"
+    image: "/images/dal-makhani.webp"
   },
   {
     id: 4,
@@ -56,7 +56,7 @@ export const menuItems: MenuItem[] = [
     description: "Long grain basmati rice cooked with marinated chicken and royal spices.",
     isBestSeller: true,
     isVeg: false,
-    image: "https://res.cloudinary.com/dvcgzneiy/image/upload/v1767263348/Whisk_fa556516970e2acb9304b2ea716eb0b2dr_qgycmp.webp"
+    image: "/images/biryani.webp",
   },
 
   // Main Course
@@ -68,7 +68,7 @@ export const menuItems: MenuItem[] = [
     description: "Tandoori chicken simmered in a creamy tomato gravy.",
     isBestSeller: true,
     isVeg: false,
-    image: "https://res.cloudinary.com/dvcgzneiy/image/upload/v1767263348/Whisk_0aa6eeb5a439017a12e4274223851d9cdr_trkgsm.webp"
+    image: "/images/butter-chicken.webp"
   },
   // ... (Other items kept as text-only for main menu)
   {

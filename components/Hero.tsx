@@ -43,7 +43,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="block text-royal-gold tracking-[0.2em] uppercase font-semibold mb-4 text-sm md:text-base"
         >
-          The Pinnacle of Fine Dining
+          Best Food in Bihar
         </motion.span>
         
         <motion.h1 
