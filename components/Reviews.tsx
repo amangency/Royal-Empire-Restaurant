@@ -34,7 +34,7 @@ const reviews = [
    {
     id: 5,
     name: "Sneha Gupta",
-    rating: 5,
+    rating: 4,
     text: "Loved the vibe! Perfect place for anniversary dinner. Cocktails were amazing.",
     date: "1 month ago"
   }
@@ -48,57 +48,60 @@ const Reviews: React.FC = () => {
   const reviewLink = `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
 
   return (
-    <section id="reviews" className="py-24 bg-black relative overflow-hidden">
+    <section id="reviews" className="py-16 md:py-24 bg-black relative overflow-hidden">
       
-      {/* Container for Header Only */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-16">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-10 md:mb-16">
         <div className="text-center">
-          <span className="text-royal-gold text-xs font-bold tracking-[0.3em] uppercase">Testimonials</span>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mt-4">
+          <span className="text-royal-gold text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase">Testimonials</span>
+          <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mt-3 md:mt-4">
             The Royal Experience
           </h2>
-          <div className="w-24 h-1 bg-royal-gold mx-auto mt-6"></div>
+          <div className="w-16 md:w-24 h-1 bg-royal-gold mx-auto mt-4 md:mt-6"></div>
         </div>
       </div>
 
-      {/* 🔄 Moving Reviews Slider (FULL WIDTH - No Container Restriction) */}
+      {/* 🔄 Moving Reviews Slider */}
       <div className="relative w-full overflow-hidden">
-        {/* Left Fade Gradient */}
-        <div className="absolute top-0 left-0 h-full w-24 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none"></div>
-        {/* Right Fade Gradient */}
-        <div className="absolute top-0 right-0 h-full w-24 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none"></div>
+        {/* Gradients to fade edges (Hidden on mobile to save performance) */}
+        <div className="hidden md:block absolute top-0 left-0 h-full w-24 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none"></div>
+        <div className="hidden md:block absolute top-0 right-0 h-full w-24 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none"></div>
 
         <motion.div
-          className="flex gap-6 w-max pl-4"
+          className="flex gap-4 md:gap-6 w-max pl-4"
+          // Slower duration on mobile for less dizziness
           animate={{ x: ["0%", "-50%"] }}
-          transition={{ ease: "linear", duration: 40, repeat: Infinity }}
+          transition={{ ease: "linear", duration: 50, repeat: Infinity }}
+          // Hardware acceleration hack for mobile
+          style={{ willChange: "transform" }}
         >
           {duplicatedReviews.map((review, idx) => (
             <div
               key={`${review.id}-${idx}`}
-              className="w-[350px] md:w-[450px] flex-shrink-0 bg-black p-8 border border-white/10 rounded-sm relative group hover:border-royal-gold transition-all duration-300"
+              // 📱 FIXED SIZING: w-[280px] on mobile (Fits perfectly), w-[450px] on desktop
+              className="w-[280px] md:w-[450px] flex-shrink-0 bg-black p-6 md:p-8 border border-white/10 rounded-sm relative group hover:border-royal-gold transition-all duration-300"
             >
-              <Quote className="absolute top-6 right-6 text-royal-gold/10 group-hover:text-royal-gold/30 transition-colors" size={40} />
+              <Quote className="absolute top-4 right-4 md:top-6 md:right-6 text-royal-gold/10 group-hover:text-royal-gold/30 transition-colors" size={24} />
               
-              <div className="flex gap-1 mb-6">
+              <div className="flex gap-1 mb-4 md:mb-6">
                 {[...Array(5)].map((_, i) => (
                   <Star 
                     key={i} 
-                    size={16} 
+                    size={14} 
                     className={`${i < review.rating ? 'text-royal-gold fill-royal-gold' : 'text-gray-800'}`} 
                   />
                 ))}
               </div>
               
-              {/* Font Restored to standard sans for readability, Serif for names */}
-              <p className="text-gray-300 mb-8 italic leading-relaxed text-lg font-light">"{review.text}"</p>
+              {/* Responsive Text Size */}
+              <p className="text-gray-300 mb-6 md:mb-8 italic leading-relaxed text-sm md:text-lg font-light">"{review.text}"</p>
               
-              <div className="flex justify-between items-end border-t border-white/10 pt-6">
+              <div className="flex justify-between items-end border-t border-white/10 pt-4 md:pt-6">
                 <div>
-                  <h4 className="text-white font-bold font-serif text-xl tracking-wide">{review.name}</h4>
-                  <span className="text-xs text-royal-gold/60 uppercase tracking-widest">{review.date}</span>
+                  <h4 className="text-white font-bold font-serif text-lg md:text-xl tracking-wide">{review.name}</h4>
+                  <span className="text-[10px] md:text-xs text-royal-gold/60 uppercase tracking-widest">{review.date}</span>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-royal-gold/10 flex items-center justify-center text-royal-gold font-serif font-bold text-lg border border-royal-gold/20">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-royal-gold/10 flex items-center justify-center text-royal-gold font-serif font-bold text-sm md:text-lg border border-royal-gold/20">
                   {review.name.charAt(0)}
                 </div>
               </div>
@@ -107,28 +110,20 @@ const Reviews: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* 🚀 CTA Button (FIXED: No White Hover, Gold & Black Only) */}
-      <div className="text-center mt-16 relative z-10">
+      {/* 🚀 CTA Button */}
+      <div className="text-center mt-10 md:mt-16 relative z-10">
         <motion.a
           href={reviewLink}
           target="_blank"
           rel="noopener noreferrer"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="inline-flex items-center gap-4 bg-royal-gold text-black px-10 py-5 rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-royal-gold border border-royal-gold transition-all duration-300 group cursor-pointer"
+          className="inline-flex items-center gap-3 md:gap-4 bg-royal-gold text-black px-6 py-3 md:px-10 md:py-5 rounded-sm font-bold uppercase tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-base hover:bg-black hover:text-royal-gold border border-royal-gold transition-all duration-300 group cursor-pointer"
         >
           <span>Rate Us on Google</span>
-          <div className="flex gap-1">
-            {/* Stars change color on hover logic */}
-            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-            <Star size={16} className="text-black fill-black group-hover:text-royal-gold group-hover:fill-royal-gold transition-colors" />
-          </div>
-          <ArrowRight className="group-hover:translate-x-2 transition-transform duration-300" />
+          <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-300" />
         </motion.a>
-        <p className="mt-6 text-white/30 text-xs tracking-wider uppercase">Tap to open Google Reviews directly</p>
+        <p className="mt-4 md:mt-6 text-white/30 text-[10px] md:text-xs tracking-wider uppercase">Tap to open Google Reviews directly</p>
       </div>
 
     </section>
