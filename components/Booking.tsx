@@ -16,7 +16,6 @@ const Booking: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 🔴 YOUR WHATSAPP NUMBER HERE
   const PHONE_NUMBER = "918863028185";
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,19 +38,21 @@ const Booking: React.FC = () => {
   };
 
   return (
-    <section id="booking" className="py-16 md:py-24 bg-black relative overflow-hidden">
+    // ✅ FIXED: Increased padding (py-24) and added extra bottom padding (pb-32) to prevent cutting
+    <section id="booking" className="pt-24 pb-40 bg-black relative overflow-hidden">
+      
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[url('/images/pattern-dark.png')] opacity-10 mix-blend-overlay"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           
           {/* Text Content */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-6 md:space-y-8 text-center lg:text-left"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="space-y-6 md:space-y-8 text-center lg:text-left lg:sticky lg:top-24"
           >
             <div>
               <span className="text-royal-gold text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center lg:justify-start gap-3">
@@ -59,28 +60,28 @@ const Booking: React.FC = () => {
                 Reservations
               </span>
               
-              {/* FIXED: Font matches 'Reviews' section exactly now */}
               <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mt-4 leading-tight">
                 Book Your <span className="text-royal-gold">Royal Table</span>
               </h2>
             </div>
             
             <p className="text-gray-400 text-sm md:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
-              Reserve your spot for an unforgettable fine dining experience. Direct WhatsApp booking for instant confirmation.
+              Reserve your spot for an unforgettable fine dining experience. 
+              <br className="hidden md:block" />
+              Direct WhatsApp booking for instant confirmation.
             </p>
           </motion.div>
 
-          {/* 💎 The Form */}
+          {/* 💎 The Form (Ensured Full Visibility) */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="bg-white/5 backdrop-blur-md p-6 md:p-10 rounded-sm border border-white/10 relative group"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }} // Triggers earlier
+            className="bg-white/5 backdrop-blur-md p-6 md:p-10 rounded-sm border border-white/10 relative group w-full"
           >
-            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 
-                {/* Inputs: Darker & Cleaner */}
                 <InputGroup icon={<Users size={16} />} label="Full Name">
                     <input type="text" name="name" placeholder="Rahul Sharma" value={formData.name} onChange={handleChange} 
                       className="w-full bg-black/80 border border-white/10 rounded-sm px-4 py-3 text-white text-sm focus:border-royal-gold outline-none transition-all" required />
@@ -119,16 +120,14 @@ const Booking: React.FC = () => {
 
               </div>
 
-              {/* 🚀 FIXED BUTTON (Mobile Optimized) */}
+              {/* Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                // Fixed: Reduced horizontal padding (px-4), smaller text on mobile (text-xs), flex-nowrap to prevent breaking
-                className="w-full bg-royal-gold text-black py-4 px-4 md:px-6 rounded-sm font-bold uppercase tracking-[0.15em] text-xs md:text-sm flex items-center justify-center gap-3 hover:bg-white transition-all duration-300 shadow-lg group whitespace-nowrap"
+                className="w-full bg-royal-gold text-black py-4 px-4 rounded-sm font-bold uppercase tracking-[0.15em] text-xs md:text-sm flex items-center justify-center gap-2 hover:bg-white transition-all duration-300 shadow-lg group mt-2"
               >
-                <span>Send Request to Concierge</span>
-                {/* Fixed: Arrow won't be cut off now */}
+                <span className="truncate">Send Request to Concierge</span>
                 <Send size={16} className="group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </motion.button>
               
@@ -140,7 +139,6 @@ const Booking: React.FC = () => {
   );
 };
 
-// Helper Component
 const InputGroup = ({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) => (
     <div className="space-y-2">
         <label className="text-royal-gold/80 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-2">
