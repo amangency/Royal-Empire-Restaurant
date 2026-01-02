@@ -20,7 +20,7 @@ const reviews = [
   {
     id: 3,
     name: "Rahul Verma",
-    rating: 4,
+    rating: 5,
     text: "Great ambiance and staff. The Biryani is a must-try.",
     date: "3 weeks ago"
   },
