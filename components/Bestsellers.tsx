@@ -64,10 +64,11 @@ const Bestsellers: React.FC = () => {
 
                 {/* Image */}
                 <img 
-                  src={item.image} 
-                  alt={item.name}
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-[0.85] group-hover:brightness-100"
-                />
+  src={item.image} 
+  alt={item.name}
+  loading="lazy" // 👈 बस ये एक लाइन जोड़नी है
+  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-[0.85] group-hover:brightness-100"
+/>
 
                 {/* Price Badge */}
                 <div className="absolute bottom-4 right-4 z-20 bg-royal-gold text-black font-bold px-3 py-1 text-sm rounded-sm shadow-xl">
