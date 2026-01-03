@@ -1,12 +1,14 @@
 import React, { useState, Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // ✅ Router जोड़ा
 import Navbar from './components/Navbar';
-import Hero from './components/Hero'; // Hero is Critical (Keep it Eager)
+import Hero from './components/Hero'; 
 import { CartProvider } from './context/CartContext';
 import { Compass } from 'lucide-react';
 
-// ✅ 1. Lazy Load HEAVY Hidden Components
+// ✅ 1. Lazy Load Components
 const CartModal = lazy(() => import('./components/CartModal'));
 const InfoModals = lazy(() => import('./components/InfoModals'));
+const Review = lazy(() => import('./components/Review')); // ✅ रिव्यु शील्ड जोड़ा
 
 // Section Components
 const Bestsellers = lazy(() => import('./components/Bestsellers'));
@@ -26,44 +28,61 @@ const SectionLoader = () => (
   </div>
 );
 
+// ✅ Main Site Component (Landing Page)
+// इसे अलग किया ताकि /review पर जाने पर ये सब न दिखे
+const MainSite = ({ onOpenAbout, onOpenTerms }: { onOpenAbout: () => void, onOpenTerms: () => void }) => (
+  <main role="main">
+    <Hero />
+    <Suspense fallback={<SectionLoader />}>
+      <Bestsellers />
+      <Features />
+      <Menu />
+      <Gallery />
+      <Reviews />
+      <Booking />
+      <Location onOpenAbout={onOpenAbout} onOpenTerms={onOpenTerms} />
+    </Suspense>
+  </main>
+);
+
 function App() {
   const [activeInfoModal, setActiveInfoModal] = useState<'about' | 'terms' | null>(null);
 
   return (
     <CartProvider>
-      <div className="min-h-screen bg-black text-white font-sans selection:bg-royal-gold selection:text-black">
-        <Navbar />
-        
-        <main role="main">
-          {/* ✅ Hero loads immediately (No Suspense here) */}
-          <Hero />
+      <Router> {/* ✅ पूरी ऐप को Router में लपेटा */}
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-royal-gold selection:text-black">
+          <Navbar />
           
-          <Suspense fallback={<SectionLoader />}>
-            <Bestsellers />
-            <Features />
-            <Menu />
-            <Gallery />
-            <Reviews />
-            <Booking />
-            <Location 
-              onOpenAbout={() => setActiveInfoModal('about')}
-              onOpenTerms={() => setActiveInfoModal('terms')}
+          <Routes>
+            {/* ✅ होम पेज रूट (पूरा रेस्टोरेंट यहाँ दिखेगा) */}
+            <Route path="/" element={
+              <MainSite 
+                onOpenAbout={() => setActiveInfoModal('about')}
+                onOpenTerms={() => setActiveInfoModal('terms')}
+              />
+            } />
+
+            {/* ✅ रिव्यु शील्ड रूट (सिर्फ रिव्यु पेज यहाँ दिखेगा) */}
+            <Route path="/review" element={
+              <Suspense fallback={<SectionLoader />}>
+                <Review />
+              </Suspense>
+            } />
+          </Routes>
+
+          {/* ✅ Cart & Modals (Global) */}
+          <Suspense fallback={null}>
+            <CartModal />
+            <InfoModals 
+              isOpen={activeInfoModal !== null} 
+              onClose={() => setActiveInfoModal(null)}
+              type={activeInfoModal || 'about'}
             />
           </Suspense>
-        </main>
 
-        {/* ✅ FIXED: Cart & Modals are now Lazy Loaded inside Suspense */}
-        {/* Isse initial Javascript bundle chhota ho jayega */}
-        <Suspense fallback={null}>
-          <CartModal />
-          <InfoModals 
-            isOpen={activeInfoModal !== null} 
-            onClose={() => setActiveInfoModal(null)}
-            type={activeInfoModal || 'about'}
-          />
-        </Suspense>
-
-      </div>
+        </div>
+      </Router>
     </CartProvider>
   );
 }
