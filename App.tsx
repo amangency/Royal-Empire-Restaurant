@@ -1,14 +1,15 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // ✅ Router जोड़ा
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
 import Navbar from './components/Navbar';
 import Hero from './components/Hero'; 
 import { CartProvider } from './context/CartContext';
 import { Compass } from 'lucide-react';
+import ScrollToAnchor from './components/ScrollToAnchor'; // ✅ 1. यहाँ Import किया
 
-// ✅ 1. Lazy Load Components
+// Lazy Load Components
 const CartModal = lazy(() => import('./components/CartModal'));
 const InfoModals = lazy(() => import('./components/InfoModals'));
-const Review = lazy(() => import('./components/Review')); // ✅ रिव्यु शील्ड जोड़ा
+const Review = lazy(() => import('./components/Review')); 
 
 // Section Components
 const Bestsellers = lazy(() => import('./components/Bestsellers'));
@@ -28,8 +29,6 @@ const SectionLoader = () => (
   </div>
 );
 
-// ✅ Main Site Component (Landing Page)
-// इसे अलग किया ताकि /review पर जाने पर ये सब न दिखे
 const MainSite = ({ onOpenAbout, onOpenTerms }: { onOpenAbout: () => void, onOpenTerms: () => void }) => (
   <main role="main">
     <Hero />
@@ -50,12 +49,16 @@ function App() {
 
   return (
     <CartProvider>
-      <Router> {/* ✅ पूरी ऐप को Router में लपेटा */}
+      <Router> 
+        {/* ✅ 2. यहाँ Component लगाया (Router के अंदर, सबसे ऊपर) */}
+        {/* यह URL चेक करेगा और सही जगह स्क्रॉल करेगा */}
+        <ScrollToAnchor />
+
         <div className="min-h-screen bg-black text-white font-sans selection:bg-royal-gold selection:text-black">
           <Navbar />
           
           <Routes>
-            {/* ✅ होम पेज रूट (पूरा रेस्टोरेंट यहाँ दिखेगा) */}
+            {/* होम पेज */}
             <Route path="/" element={
               <MainSite 
                 onOpenAbout={() => setActiveInfoModal('about')}
@@ -63,7 +66,7 @@ function App() {
               />
             } />
 
-            {/* ✅ रिव्यु शील्ड रूट (सिर्फ रिव्यु पेज यहाँ दिखेगा) */}
+            {/* रिव्यु शील्ड पेज */}
             <Route path="/review" element={
               <Suspense fallback={<SectionLoader />}>
                 <Review />
@@ -71,7 +74,7 @@ function App() {
             } />
           </Routes>
 
-          {/* ✅ Cart & Modals (Global) */}
+          {/* Cart & Modals */}
           <Suspense fallback={null}>
             <CartModal />
             <InfoModals 
@@ -87,4 +90,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
