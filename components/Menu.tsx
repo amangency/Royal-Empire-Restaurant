@@ -9,30 +9,42 @@ const Menu: React.FC = () => {
   const { addToCart } = useCart();
   const [toast, setToast] = useState<{ show: boolean; message: string; id: number } | null>(null);
 
-  // Handle Deep Linking for Menu Items
+  // --- SMART AUTO-SCROLL LOGIC ---
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const menuItemId = params.get('menuItem');
-    
+    const tableId = params.get('table');
+
+    // अगर टेबल नंबर है, तो उसे लोकल स्टोरेज में सेव कर लो (Order के वक्त काम आएगा)
+    if (tableId) {
+      localStorage.setItem('tableNumber', tableId);
+    }
+
+    // 1. अगर किसी खास डिश का लिंक है (menuItem)
     if (menuItemId) {
       const id = parseInt(menuItemId);
       const item = menuItems.find(i => i.id === id);
       
       if (item) {
-        // Switch category if needed
         setActiveCategory(item.category);
-        
-        // Delay scroll to allow render
         setTimeout(() => {
           const element = document.getElementById(`menu-item-${id}`);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Add a temporary highlight animation
             element.classList.add('animate-pulse');
             setTimeout(() => element.classList.remove('animate-pulse'), 2000);
           }
-        }, 500);
+        }, 600);
       }
+    } 
+    // 2. अगर सिर्फ जनरल मेनू पर आना है (QR Scan Case)
+    else if (window.location.hash === '#menu-section') {
+      setTimeout(() => {
+        const menuSection = document.getElementById('menu-section');
+        if (menuSection) {
+          menuSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
     }
   }, []);
 
@@ -52,7 +64,7 @@ const Menu: React.FC = () => {
   };
 
   const handleShare = async (item: typeof menuItems[0]) => {
-    const url = `${window.location.origin}${window.location.pathname}?menuItem=${item.id}#menu`;
+    const url = `${window.location.origin}${window.location.pathname}?menuItem=${item.id}#menu-section`;
     const shareData = {
       title: `Royal Empire - ${item.name}`,
       text: `Check out ${item.name} at Royal Empire Restaurant! ₹${item.price}`,
@@ -63,7 +75,7 @@ const Menu: React.FC = () => {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        // User cancelled or error
+        console.log('Share cancelled');
       }
     } else {
       try {
@@ -76,7 +88,7 @@ const Menu: React.FC = () => {
   };
 
   return (
-    <section id="menu" className="py-24 bg-royal-black relative min-h-screen">
+    <section id="menu-section" className="py-24 bg-royal-black relative min-h-screen scroll-mt-20 md:scroll-mt-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -88,10 +100,10 @@ const Menu: React.FC = () => {
           >
             Menu
           </motion.h2>
-          <p className="text-gray-500 font-light tracking-wide uppercase text-sm">Exquisite Flavors</p>
+          <p className="text-gray-500 font-light tracking-wide uppercase text-sm">Exquisite Flavors of Muzaffarpur</p>
         </div>
 
-        {/* Category Filter - Scrollable Strip */}
+        {/* Category Filter */}
         <div className="sticky top-20 z-40 bg-royal-black/95 backdrop-blur-sm py-4 mb-12 -mx-4 px-4 border-b border-white/5">
           <div className="flex overflow-x-auto gap-8 scrollbar-hide snap-x justify-start md:justify-center items-center min-w-full">
             {categories.map((category) => (
@@ -130,21 +142,16 @@ const Menu: React.FC = () => {
                 className="group relative flex justify-between gap-4 items-start"
               >
                 <div className="flex-grow">
-                  {/* Name & Price Row */}
                   <div className="flex items-baseline justify-between relative">
                     <h3 className="text-xl md:text-2xl font-serif text-white group-hover:text-royal-gold transition-colors duration-300 pr-4 bg-royal-black z-10">
                       {item.name}
                     </h3>
-                    
-                    {/* Dotted Line */}
                     <div className="absolute bottom-1.5 left-0 w-full border-b border-dotted border-white/20 z-0"></div>
-
                     <span className="text-xl font-serif text-royal-gold bg-royal-black z-10 pl-4 font-semibold">
                       ₹{item.price}
                     </span>
                   </div>
 
-                  {/* Description & Badges */}
                   <div className="mt-2 flex flex-col gap-1">
                      <p className="text-gray-500 text-sm font-light leading-relaxed max-w-[90%]">
                       {item.description}
@@ -162,22 +169,17 @@ const Menu: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Actions Column */}
                 <div className="flex flex-col gap-3 mt-1 shrink-0">
-                  {/* Add Button */}
                   <button
                     onClick={() => handleAddToCart(item)}
                     className="w-8 h-8 rounded-full border border-royal-gold/30 text-royal-gold flex items-center justify-center hover:bg-royal-gold hover:text-black transition-all duration-300 hover:scale-110 active:scale-95"
-                    aria-label={`Add ${item.name} to cart`}
                   >
                     <Plus size={16} />
                   </button>
 
-                  {/* Share Button */}
                   <button
                     onClick={() => handleShare(item)}
                     className="w-8 h-8 rounded-full border border-gray-700 text-gray-500 flex items-center justify-center hover:border-royal-gold hover:text-royal-gold transition-all duration-300 active:scale-95"
-                    aria-label={`Share ${item.name}`}
                   >
                     <Share2 size={14} />
                   </button>
@@ -199,26 +201,21 @@ const Menu: React.FC = () => {
         )}
       </div>
 
-      {/* Pop-up Toast Notification */}
+      {/* Toast Notification */}
       <AnimatePresence>
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: 50, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: 20, x: '-50%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed bottom-12 left-1/2 z-[150] flex items-center gap-4 bg-royal-gold px-6 py-4 rounded-sm shadow-[0_10px_30px_-10px_rgba(212,175,55,0.6)]"
+            className="fixed bottom-12 left-1/2 z-[150] flex items-center gap-4 bg-royal-gold px-6 py-4 rounded-sm shadow-xl"
           >
-            <div className="bg-black p-1.5 rounded-full flex items-center justify-center">
+            <div className="bg-black p-1.5 rounded-full">
               <Check size={14} className="text-royal-gold" strokeWidth={3} />
             </div>
             <div>
-              <p className="text-black font-serif font-bold text-sm tracking-wide">
-                Royal Update
-              </p>
-              <p className="text-black/80 text-xs font-medium">
-                {toast.message}
-              </p>
+              <p className="text-black font-serif font-bold text-sm tracking-wide">Royal Update</p>
+              <p className="text-black/80 text-xs font-medium">{toast.message}</p>
             </div>
           </motion.div>
         )}
