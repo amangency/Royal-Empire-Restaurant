@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Quote, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom'; // ✅ Link import किया
+import { Link } from 'react-router-dom'; // 👈 यह लाइन सबसे ज़रूरी है!
 
 const reviews = [
   {
@@ -41,6 +41,7 @@ const reviews = [
   }
 ];
 
+// Double the array for seamless looping
 const duplicatedReviews = [...reviews, ...reviews];
 
 const Reviews: React.FC = () => {
@@ -60,6 +61,7 @@ const Reviews: React.FC = () => {
 
       {/* 🔄 Moving Reviews Slider */}
       <div className="relative w-full overflow-hidden">
+        {/* Gradients */}
         <div className="hidden md:block absolute top-0 left-0 h-full w-32 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none"></div>
         <div className="hidden md:block absolute top-0 right-0 h-full w-32 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none"></div>
 
@@ -103,19 +105,19 @@ const Reviews: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* 🚀 CTA Button - अब यह सीधा Google नहीं, बल्कि हमारे Review Page पर ले जाएगा */}
+      {/* 🚀 CTA Button Logic Fixed */}
       <div className="text-center mt-10 md:mt-16 relative z-10">
         
-        {/* ✅ यहाँ मैंने Link टैग लगाया है जो /review पर ले जाएगा */}
-        <Link to="/review">
-          <motion.div
+        {/* 👇 यहाँ देखो: अब यह Link टैग है जो /review पर ले जाएगा */}
+        <Link to="/review"> 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-3 md:gap-4 bg-[#D4AF37] text-black px-6 py-3 md:px-10 md:py-5 rounded-xl font-bold uppercase tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-base hover:bg-white transition-all duration-300 group cursor-pointer"
           >
             <span>Rate Your Experience</span>
             <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-300" />
-          </motion.div>
+          </motion.button>
         </Link>
         
         <p className="mt-4 md:mt-6 text-white/30 text-[10px] md:text-xs tracking-wider uppercase">Tap to share your feedback</p>
