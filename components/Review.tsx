@@ -9,7 +9,7 @@ const Review: React.FC = () => {
 
   // इन डिटेल्स को अपडेट करना न भूलें
   const GOOGLE_MAPS_LINK = "https://g.page/r/YOUR_MAPS_LINK/review"; 
-  const OWNER_WHATSAPP = "91XXXXXXXXXX"; // यहाँ असली नंबर डालें
+  const OWNER_WHATSAPP = "918863028185"; // यहाँ असली नंबर डालें
 
   const handleAction = () => {
     if (rating >= 4) {
