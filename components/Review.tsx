@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, MessageSquare, ArrowRight, Home } from 'lucide-react';
+import { Star, ArrowRight, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Review: React.FC = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
 
-  // इन डिटेल्स को अपडेट करना न भूलें
-  const GOOGLE_MAPS_LINK = "https://g.page/r/YOUR_MAPS_LINK/review"; 
-  const OWNER_WHATSAPP = "918863028185"; // यहाँ असली नंबर डालें
+  // ✅ 1. आपका असली Google Review Link
+  const GOOGLE_MAPS_LINK = "https://search.google.com/local/writereview?placeid=ChIJi51R6RYR7TkRviG57pCe3fo"; 
+  
+  // ✅ 2. आपका असली WhatsApp Number
+  const OWNER_WHATSAPP = "918863028185"; 
 
   const handleAction = () => {
     if (rating >= 4) {
-      // 4 या 5 स्टार: सीधा गूगल मैप्स पर
+      // 4 या 5 स्टार: सीधा Google Maps पर ले जाएगा
       window.open(GOOGLE_MAPS_LINK, '_blank');
     } else {
-      // 1, 2 या 3 स्टार: मालिक को व्हाट्सएप पर फीडबैक
+      // 1, 2 या 3 स्टार: सीधा आपके WhatsApp पर मैसेज भेजेगा
       const msg = encodeURIComponent(`नमस्ते Royal Empire! मैं अपना अनुभव साझा करना चाहता हूँ। मेरी रेटिंग: ${rating} Star.`);
       window.open(`https://wa.me/${OWNER_WHATSAPP}?text=${msg}`, '_blank');
     }
@@ -74,7 +76,7 @@ const Review: React.FC = () => {
                 )}
               </div>
 
-              {/* DYNAMIC BUTTON - ये रेटिंग के हिसाब से बदलेगा */}
+              {/* ACTION BUTTON */}
               <button
                 onClick={handleAction}
                 className="w-full bg-[#D4AF37] text-black font-extrabold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-[#b8962d] transition-all transform hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
