@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
     e.preventDefault();
     const element = document.getElementById(id.replace('#', ''));
     if (element) {
-      const offset = 80; 
+      const offset = 80;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Signature', href: '#signature' },
-    { name: 'Menu', href: '#menu-section' },
+    { name: 'Menu', href: '#menu' },
     { name: 'Gallery', href: '#gallery' },
     { name: 'Reserve', href: '#booking' },
     { name: 'Reviews', href: '#reviews' },
@@ -49,10 +49,10 @@ const Navbar: React.FC = () => {
     <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-royal-black/95 backdrop-blur-md py-3 shadow-2xl border-b border-royal-gold/10' : 'bg-transparent py-6'}`}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-full">
-          
+
           {/* Logo */}
-          <a 
-            href="#home" 
+          <a
+            href="#home"
             onClick={(e) => scrollTo(e, 'home')}
             className="flex-shrink-0 flex items-center gap-2 group relative z-10"
             aria-label="Royal Empire Restaurant Home"
@@ -85,24 +85,24 @@ const Navbar: React.FC = () => {
 
           {/* Action Center */}
           <div className="flex items-center gap-4 xl:gap-6 flex-shrink-0 relative z-10">
-            <a 
+            <a
               href="#booking"
               onClick={(e) => scrollTo(e, '#booking')}
               className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-royal-gold border border-royal-gold/40 px-5 py-2 hover:bg-royal-gold hover:text-black transition-all duration-300 rounded-sm whitespace-nowrap"
               aria-label="Book a Table"
             >
-              <Calendar size={14} strokeWidth={2.5} aria-hidden="true" /> 
+              <Calendar size={14} strokeWidth={2.5} aria-hidden="true" />
               <span>Book Table</span>
             </a>
-            
-            <button 
+
+            <button
               onClick={() => setIsCartOpen(true)}
               className="relative text-royal-gold hover:text-white transition-all duration-300 p-2"
               aria-label="Open Shopping Cart"
             >
               <ShoppingBag size={22} strokeWidth={2} aria-hidden="true" />
               {totalItems > 0 && (
-                <motion.span 
+                <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute -top-1 -right-1 bg-royal-gold text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg"
@@ -113,7 +113,7 @@ const Navbar: React.FC = () => {
             </button>
 
             <div className="lg:hidden">
-              <button 
+              <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="text-royal-gold p-1"
                 aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed inset-0 top-0 left-0 w-full h-screen bg-royal-black flex flex-col items-center justify-center lg:hidden z-[-1]"
-            role="dialog" 
+            role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation Menu"
           >
@@ -152,7 +152,7 @@ const Navbar: React.FC = () => {
                   {link.name}
                 </motion.a>
               ))}
-              <motion.a 
+              <motion.a
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}

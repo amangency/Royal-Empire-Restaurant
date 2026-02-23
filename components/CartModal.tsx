@@ -5,11 +5,11 @@ import { useCart } from '../context/CartContext';
 
 const CartModal: React.FC = () => {
   const { cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity } = useCart();
-  
+
   // Local State
   const [orderType, setOrderType] = useState<'delivery' | 'dine-in'>('delivery');
   const [totalAmount, setTotalAmount] = useState(0);
-  
+
   // Form States
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -18,7 +18,7 @@ const CartModal: React.FC = () => {
   const [customMessage, setCustomMessage] = useState('');
 
   // 🔴 REPLACE WITH YOUR NUMBER
-  const PHONE_NUMBER = "918863028185"; 
+  const PHONE_NUMBER = "918863028185";
 
   // 🧮 Auto-Calculate Total
   useEffect(() => {
@@ -33,7 +33,7 @@ const CartModal: React.FC = () => {
   const handleOrder = () => {
     // Validation
     if (!name) return alert("Please enter your Name!");
-    
+
     if (orderType === 'delivery') {
       if (!phone || !address) return alert("Please enter Phone & Address!");
     } else {
@@ -45,7 +45,7 @@ const CartModal: React.FC = () => {
     message += `*Type:* ${orderType === 'dine-in' ? '🍽️ DINE-IN' : '🛵 DELIVERY'}\n`;
     message += `--------------------------------\n`;
     message += `*Name:* ${name}\n`;
-    
+
     if (orderType === 'delivery') {
       message += `*Phone:* ${phone}\n`;
       message += `*Address:* ${address}\n`;
@@ -92,7 +92,7 @@ const CartModal: React.FC = () => {
               <h2 className="text-xl font-serif font-bold text-royal-gold flex items-center gap-2">
                 <ShoppingBag size={20} /> Your Cart
               </h2>
-              <button 
+              <button
                 onClick={() => setIsCartOpen(false)}
                 className="text-white/50 hover:text-white transition-colors"
                 aria-label="Close Cart"
@@ -113,9 +113,9 @@ const CartModal: React.FC = () => {
                   {/* Cart Items List */}
                   <div className="space-y-4">
                     {cart.map((item) => (
-                      <motion.div 
+                      <motion.div
                         layout
-                        key={item.id} 
+                        key={item.id}
                         className="flex gap-4 bg-white/5 p-3 rounded-sm border border-white/5"
                       >
                         <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-sm" />
@@ -124,9 +124,9 @@ const CartModal: React.FC = () => {
                           <p className="text-royal-gold text-xs">₹{item.price}</p>
                           <div className="flex items-center gap-3 mt-2">
                             <div className="flex items-center bg-black rounded-sm border border-white/10">
-                              <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-2 text-white/50 hover:text-white" disabled={item.quantity <= 1}>-</button>
+                              <button onClick={() => updateQuantity(item.id, -1)} className="px-2 text-white/50 hover:text-white" disabled={item.quantity <= 1}>-</button>
                               <span className="px-2 text-xs text-white font-mono">{item.quantity}</span>
-                              <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-2 text-white/50 hover:text-white">+</button>
+                              <button onClick={() => updateQuantity(item.id, +1)} className="px-2 text-white/50 hover:text-white">+</button>
                             </div>
                             <button onClick={() => removeFromCart(item.id)} className="text-red-400/50 hover:text-red-400 ml-auto"><Trash2 size={16} /></button>
                           </div>
@@ -141,7 +141,7 @@ const CartModal: React.FC = () => {
                   {/* Checkout Form (Now inside Scroll View) */}
                   <div className="space-y-4 pb-4">
                     <h3 className="text-royal-gold font-bold uppercase tracking-widest text-xs mb-3">Order Details</h3>
-                    
+
                     {/* Toggle */}
                     <div className="flex bg-black p-1 rounded-md border border-white/10">
                       <button onClick={() => setOrderType('delivery')} className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-sm transition-all ${orderType === 'delivery' ? 'bg-royal-gold text-black shadow-lg' : 'text-white/50 hover:text-white'}`}>
@@ -179,17 +179,17 @@ const CartModal: React.FC = () => {
             {cart.length > 0 && (
               <div className="p-5 bg-white/5 border-t border-white/10 flex-shrink-0 z-20">
                 <div className="flex justify-between items-end">
-                   <div>
-                      <p className="text-xs text-white/50 uppercase">Total Payable</p>
-                      <p className="text-2xl font-serif font-bold text-royal-gold">₹{totalAmount}</p>
-                   </div>
-                   <button
+                  <div>
+                    <p className="text-xs text-white/50 uppercase">Total Payable</p>
+                    <p className="text-2xl font-serif font-bold text-royal-gold">₹{totalAmount}</p>
+                  </div>
+                  <button
                     onClick={handleOrder}
                     className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-sm font-bold uppercase tracking-widest text-sm shadow-lg flex items-center gap-2"
-                   >
-                     <span>Send Order</span>
-                     <Send size={16} />
-                   </button>
+                  >
+                    <span>Send Order</span>
+                    <Send size={16} />
+                  </button>
                 </div>
               </div>
             )}

@@ -24,7 +24,7 @@ const Menu: React.FC = () => {
     if (menuItemId) {
       const id = parseInt(menuItemId);
       const item = menuItems.find(i => i.id === id);
-      
+
       if (item) {
         setActiveCategory(item.category);
         setTimeout(() => {
@@ -36,11 +36,11 @@ const Menu: React.FC = () => {
           }
         }, 600);
       }
-    } 
+    }
     // 2. अगर सिर्फ जनरल मेनू पर आना है (QR Scan Case)
-    else if (window.location.hash === '#menu-section') {
+    else if (window.location.hash === '#menu') {
       setTimeout(() => {
-        const menuSection = document.getElementById('menu-section');
+        const menuSection = document.getElementById('menu');
         if (menuSection) {
           menuSection.scrollIntoView({ behavior: 'smooth' });
         }
@@ -64,7 +64,7 @@ const Menu: React.FC = () => {
   };
 
   const handleShare = async (item: typeof menuItems[0]) => {
-    const url = `${window.location.origin}${window.location.pathname}?menuItem=${item.id}#menu-section`;
+    const url = `${window.location.origin}${window.location.pathname}?menuItem=${item.id}#menu`;
     const shareData = {
       title: `Royal Empire - ${item.name}`,
       text: `Check out ${item.name} at Royal Empire Restaurant! ₹${item.price}`,
@@ -88,12 +88,12 @@ const Menu: React.FC = () => {
   };
 
   return (
-    <section id="menu-section" className="py-24 bg-royal-black relative min-h-screen scroll-mt-20 md:scroll-mt-24">
+    <section id="menu" className="py-24 bg-royal-black relative min-h-screen scroll-mt-20 md:scroll-mt-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="text-center mb-16">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             className="text-royal-gold font-serif text-5xl md:text-6xl font-bold mb-4 tracking-tight"
@@ -110,15 +110,14 @@ const Menu: React.FC = () => {
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`whitespace-nowrap pb-1 text-sm md:text-base uppercase tracking-widest transition-all duration-300 relative snap-center ${
-                  activeCategory === category
+                className={`whitespace-nowrap pb-1 text-sm md:text-base uppercase tracking-widest transition-all duration-300 relative snap-center ${activeCategory === category
                     ? 'text-royal-gold font-bold'
                     : 'text-gray-500 hover:text-white'
-                }`}
+                  }`}
               >
                 {category}
                 {activeCategory === category && (
-                  <motion.div 
+                  <motion.div
                     layoutId="activeCategory"
                     className="absolute bottom-0 left-0 w-full h-[2px] bg-royal-gold"
                   />
@@ -153,7 +152,7 @@ const Menu: React.FC = () => {
                   </div>
 
                   <div className="mt-2 flex flex-col gap-1">
-                     <p className="text-gray-500 text-sm font-light leading-relaxed max-w-[90%]">
+                    <p className="text-gray-500 text-sm font-light leading-relaxed max-w-[90%]">
                       {item.description}
                     </p>
                     <div className="flex items-center gap-3 mt-1">
@@ -162,7 +161,7 @@ const Menu: React.FC = () => {
                       </span>
                       {item.isBestSeller && (
                         <span className="text-[10px] uppercase tracking-wider font-bold text-royal-gold flex items-center gap-1">
-                           ★ Bestseller
+                          ★ Bestseller
                         </span>
                       )}
                     </div>
@@ -191,13 +190,13 @@ const Menu: React.FC = () => {
         </div>
 
         {filteredItems.length === 0 && (
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }}
-              className="text-center text-gray-600 py-20 font-serif italic text-lg"
-            >
-                Seasonal items arriving shortly.
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-gray-600 py-20 font-serif italic text-lg"
+          >
+            Seasonal items arriving shortly.
+          </motion.div>
         )}
       </div>
 
